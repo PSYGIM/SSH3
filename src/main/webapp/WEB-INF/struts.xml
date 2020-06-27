@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://struts.apache.org/dtds/struts-2.5.dtd">
+
+<struts>
+    <constant name="struts.i18n.encoding" value="UTF-8"/>
+    <constant name="struts.enable.DynamicMethodInvocation" value="true" />
+    <constant name="struts.multipart.maxSize" value="20971520"/>
+    <constant name="struts.multipart.saveDir" value="/tmp"/>
+    <package name="default" namespace="/" extends="struts-default">
+        <!-- class属性中不写action的路径，因为在spring已经配置过了，应该写spring中bean的id -->
+        <!-- 登陆注册  -->
+        <action name="muser_login" class="loginaction" method="login">
+            <result name="input">/index.jsp</result>
+            <result name="admin_login_success" type="redirectAction">admin_music_show.action</result>
+            <result name="ordianry_login_success" type="redirectAction">ordianry_music_show</result>
+            <result name="ordianry_login_error">/index.jsp</result>
+            <result name="ordianry_login_error">/regist.jsp</result>
+        </action>
+
+        <!--管理员登录加载所有信息加载-->
+        <action name="admin_music_show" class="musicaction" method="showAllMusic">
+            <result name ="success" type="redirectAction">admin_joke_show.action</result>
+        </action>
+        <action name="admin_joke_show" class="jokeaction" method="showAllJoke">
+            <result name ="success" type="redirectAction">admin_cartoon_show</result>
+        </action>
+        <action name="admin_cartoon_show" class="cartoonaction" method="showAllCartoon">
+            <result name ="success" type="redirectAction">musershow.action</result>
+        </action>
+        <!--end-->
+
+        <!--用户登录加载所有信息-->
+        <action name="ordianry_music_show" class="musicaction" method="showAllMusic">
+            <result name ="success" type="redirectAction">ordianry_joke_show.action</result>
+        </action>
+        <action name="ordianry_joke_show" class="jokeaction" method="showAllJoke">
+            <result name ="success" type="redirectAction">ordianry_cartoon_show.action</result>
+        </action>
+        <action name="ordianry_cartoon_show" class="cartoonaction" method="showAllCartoon">
+            <result name ="success" type="redirectAction">self_music_show.action</result>
+        </action>
+        <!--end-->
+        <!--用户登录本人上传的所有信息-->
+        <action name="self_music_show" class="musicaction" method="findMusicByusername">
+            <result name ="success" type="redirectAction">self_joke_show.action</result>
+        </action>
+        <action name="self_joke_show" class="jokeaction" method="findJokeByUsername">
+            <result name ="success" type="redirectAction">self_cartoon_show.action</result>
+        </action>
+        <action name="self_cartoon_show" class="cartoonaction" method="findCartoonByUsername">
+            <result name ="success">/main.jsp</result>
+        </action>
+        <!--end-->
+        <action name="muser_regist" class="registaction" method="regist">
+            <result name="input">/regist.jsp</result>
+            <result name="admin_regist_success">/index.jsp</result>
+            <result name="ordianry_regist_success">/index.jsp</result>
+            <result name="admin_regist_error">/regist.jsp</result>
+            <result name="ordianry_regist_error">/regist.jsp</result>
+        </action>
+
+        <action name="usershow" class="adminAction" method="selectAllUsersAccount">
+            <result name="selectAllUserSuccess">/user_show.jsp</result>
+        </action>
+        <action name="musershow" class="adminAction" method="selectAllUsersAccount">
+            <result name="selectAllUserSuccess">/m_user_show.jsp</result>
+        </action>
+
+        <!-- 管理员对user_2表操作 -->
+        <action name="user_update" class="adminAction" method="updateUserAccount">
+            <result name="updateUserSuccess" type="redirectAction">usershow.action</result>
+        </action>
+        <action name="user_del" class="adminAction" method="deleteUserAccountById">
+            <result name="deleteAccountByIdSuccess" type="redirectAction">usershow.action</result>
+        </action>
+        <action name="user_add" class="adminAction" method="addUserAccount">
+            <result name="addAccountSuccess" type="redirectAction">usershow.action</result>
+        </action>
+        <action name="query" class="adminAction" method="selectUsersByUsername">
+            <result name="selectUsersByUsernameSuccess" >/query_show.jsp</result>
+        </action>
+
+
+        <!-- 管理员修改自己信息 -->
+        <action name="m_self_update" class="adminAction" method="updateSelf">
+            <result name="updateSelfSuccess">/m_self_update.jsp</result>
+        </action>
+        <!--管理员对所有用户上传的内容进行操作  -->
+
+        <action name="m_music_show" class="musicaction" method="showAllMusic">
+            <result name ="success">/m_music_show.jsp</result>
+        </action>
+        <action name="m_joke_show" class="jokeaction" method="showAllJoke">
+            <result name ="success">/m_joke_show.jsp</result>
+        </action>
+        <action name="m_cartoon_show" class="cartoonaction" method="showAllCartoon">
+            <result name ="success" >/m_cartoon_show.jsp</result>
+        </action>
+
+        <action name="m_cartoon_delete" class="cartoonaction" method="delCartoonById">
+            <result name ="success" type="chain">m_cartoon_show</result>
+        </action>
+        <action name="m_cartoon_update" class="cartoonaction" method="updateCartoonById">
+            <result name ="success" type="chain">m_cartoon_show</result>
+        </action>
+
+        <action name="m_joke_delete" class="jokeaction" method="delJokeById">
+            <result name ="success" type="chain" >m_joke_show</result>
+        </action>
+
+        <action name="m_joke_update" class="jokeaction" method="updateJokeById">
+            <result name ="success" type="chain">m_joke_show</result>
+        </action>
+        <action name="m_music_delete" class="musicaction" method="delMusicById">
+            <result name ="success" type = "chain">m_music_show</result>
+        </action>
+
+        <!-- 上传音乐与显示 -->
+        <action name="music_add" class="musicaction" method="addMusic">
+            <result name = 'success' type="chain">music_show</result>
+            <result name="input">/u_music_add.jsp</result>
+            <interceptor-ref name="fileUpload">
+                <param name="maximumSize">20971520</param>
+                <param name="allowedTypes">
+                    audio/mp3
+                </param>
+            </interceptor-ref>
+            <interceptor-ref name="defaultStack"/>
+        </action>
+        <action name="music_show" class="musicaction" method="showAllMusic">
+            <result name ="success">/u_music_show.jsp</result>
+        </action>
+        <action name="u_music_update" class="musicaction" >
+            <result name="success" type="chain">update_music_show</result>
+        </action>
+        <action name="querymusic" class="musicaction" method="findMusicByMusicname">
+            <result name="success" >/query_music_show.jsp</result>
+        </action>
+        <action name="u_music_delete" class="musicaction" method="delMusicById">
+            <result name="success" type="chain">update_music_show</result>
+        </action>
+        <!-- 漫画：上传、展示、修改-->
+        <action name="cartoon_show" class="cartoonaction" method="showAllCartoon">
+            <result name ="success">/u_cartoon_show.jsp</result>
+        </action>
+        <action name="cartoon_add" class="cartoonaction" method="addCartoon">
+            <result type="chain">cartoon_show</result>
+            <result name="input">/u_cartoon_add.jsp</result>
+<!--            <interceptor-ref name="fileUpload">-->
+<!--                <param name="maximumSize">20971520</param>-->
+<!--                <param name="allowedTypes">-->
+<!--                    image/bmp,image/png,image/gif,image/jpeg,image/jpg-->
+<!--                </param>-->
+<!--            </interceptor-ref>-->
+<!--            <interceptor-ref name="defaultStack"/>-->
+        </action>
+        <action name="u_cartoon_update" class="cartoonaction" method="updateCartoonById">
+            <result name="success" type="chain">update_music_show</result>
+        </action>
+        <action name="u_cartoon_delete" class="cartoonaction" method="delCartoonById">
+            <result name="success" type="chain">update_music_show</result>
+        </action>
+
+        <!-- 笑话：上传、展示、修改-->
+        <action name="joke_show" class="jokeaction" method="showAllJoke">
+            <result name ="success">/u_joke_show.jsp</result>
+        </action>
+        <action name="joke_add" class="jokeaction" method="addJoke">
+            <result name="success" type="chain">joke_show</result>
+        </action>
+        <action name="u_joke_update" class="jokeaction" method="updateJokeById">
+            <result name="success" type="chain">update_music_show</result>
+       </action>
+        <action name="u_joke_delete" class="jokeaction" method="delJokeById">
+            <result name="success" type="chain">update_music_show</result>
+        </action>
+
+        <!--用户登录本人上传的所有信息-->
+        <action name="update_music_show" class="musicaction" method="findMusicByusername">
+            <result name ="success" type="redirectAction">update_joke_show.action</result>
+        </action>
+        <action name="update_joke_show" class="jokeaction" method="findJokeByUsername">
+            <result name ="success" type="redirectAction">update_cartoon_show.action</result>
+        </action>
+        <action name="update_cartoon_show" class="cartoonaction" method="findCartoonByUsername">
+            <result name ="success">/u_content_show.jsp</result>
+        </action>
+        <!--end-->
+        <!--用户对自己上传的内容进行删除  -->
+
+        <action name="u_content_delete_show" class = "action.uContentaction" method="show">
+            <result name = "success">/u_content_show.jsp</result>
+        </action>
+
+        <!-- 用户修改自己信息 -->
+        <action name="u_self_update" class="action.u_selfaction" method="update">
+            <result name="success" >/u_self_update.jsp</result>
+        </action>
+    </package>
+</struts>

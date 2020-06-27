@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!-- 注册c3p0数据源 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.cj.jdbc.Driver"/>
+        <!--处理中文乱码问题-->
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/pyfun?useUnicode=true&amp;characterEncoding=utf-8&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC"/>
+        <property name="user" value="root"/>
+        <property name="password" value="Peng912111@"/>
+
+    </bean>
+    <!-- 注册sessionFactory -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <!--指明使用注解的实体类-->
+      <property name="annotatedClasses">
+          <list>
+              <value>cn.edu.ldu.entity.Cartoon</value>
+              <value>cn.edu.ldu.entity.Joke</value>
+              <value>cn.edu.ldu.entity.Music</value>
+              <value>cn.edu.ldu.entity.AdminUser</value>
+              <value>cn.edu.ldu.entity.OrdinaryUser</value>
+          </list>
+      </property>
+
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+                <prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate5.SpringSessionContext</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- 注册CartoonDao -->
+    <bean id="CartoonDao" class="cn.edu.ldu.dao.Impl.CartoonDaoImpl">
+        <property name="sessionFactory" ref="sessionFactory"></property>
+    </bean>
+
+    <!-- 注册CartoonService -->
+    <bean id="CartoonService" class="cn.edu.ldu.service.Impl.CartoonServiceImpl">
+        <property name="cartoonDao" ref="CartoonDao"/>
+    </bean>
+    <!-- 将Action交由Spring来管理  ref里面的studentservice引用的是上面的bean，这个是多例的，因为每个请求对应一个Action，不能多个用户共用一个Action-->
+    <!--bean的id   是struts里面action的class属性-->
+    <bean id="cartoonaction" class="cn.edu.ldu.action.CartoonAction" scope="prototype">
+        <property name="cartoonService" ref="CartoonService"/>
+    </bean>
+
+
+    <bean id="JokeDao" class="cn.edu.ldu.dao.Impl.JokeDaoImpl">
+        <property name="sessionFactory" ref="sessionFactory"></property>
+    </bean>
+    <bean id="JokeService" class="cn.edu.ldu.service.Impl.JokeServiceImpl">
+        <property name="jokeDao" ref="JokeDao"/>
+    </bean>
+    <bean id="jokeaction" class="cn.edu.ldu.action.JokeAction" scope="prototype">
+        <property name="jokeService" ref="JokeService"/>
+    </bean>
+
+
+    <bean id="MusicDao" class="cn.edu.ldu.dao.Impl.MusicDaoImpl">
+        <property name="sessionFactory" ref="sessionFactory"></property>
+    </bean>
+    <bean id="MusicService" class="cn.edu.ldu.service.Impl.MusicServiceImpl">
+        <property name="musicDao" ref="MusicDao"></property>
+    </bean>
+    <bean id="musicaction" class="cn.edu.ldu.action.MusicAction">
+        <property name="musicService" ref="MusicService"></property>
+    </bean>
+
+    <!-- 注册RegisterActionDao -->
+    <bean id="RegisterActionDao" class="cn.edu.ldu.dao.Impl.RegisterActionDaoImpl">
+        <property name="sessionFactory" ref="sessionFactory"></property>
+    </bean>
+    <!-- 注册registerActionService -->
+    <bean id="RegisterActionService" class="cn.edu.ldu.service.Impl.RegisterActionServiceImpl">
+        <property name="registerActionDao" ref="RegisterActionDao"/>
+    </bean>
+    <!-- 将Action交由Spring来管理  ref里面的studentservice引用的是上面的bean，这个是多例的，因为每个请求对应一个Action，不能多个用户共用一个Action-->
+    <!--bean的id   是struts里面action的class属性-->
+    <bean id="registaction" class="cn.edu.ldu.action.RegisterAction" scope="prototype">
+        <property name="registerActionService" ref="RegisterActionService"/>
+    </bean>
+
+
+    <!-- 登录LoginActionDao -->
+    <bean id="LoginActionDao" class="cn.edu.ldu.dao.Impl.LoginActionDaoImpl">
+        <property name="sessionFactory" ref="sessionFactory"></property>
+    </bean>
+    <!-- 登录loginActionService -->
+    <bean id="LginActionService" class="cn.edu.ldu.service.Impl.LoginActionServiceImpl">
+        <property name="loginActionDao" ref="LoginActionDao"/>
+    </bean>
+    <bean id="loginaction" class="cn.edu.ldu.action.LoginAction" scope="prototype">
+        <property name="loginActionService" ref="LginActionService"/>
+    </bean>
+
+    <!-- AdminAction -->
+    <bean id="AdminActionDao" class="cn.edu.ldu.dao.Impl.AdminActionDaoImpl">
+        <property name="sessionFactory" ref="sessionFactory"></property>
+    </bean>
+    <bean id="AdminActionService" class="cn.edu.ldu.service.Impl.AdminActionServiceImpl">
+        <property name="AdminActionDao" ref="AdminActionDao"/>
+    </bean>
+    <bean id="adminAction" class="cn.edu.ldu.action.AdminAction" scope="prototype">
+        <property name="adminActionService" ref="AdminActionService"/>
+    </bean>
+
+
+
+    <!-- 配置注册事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    <!-- 注册事务通知 -->
+    <tx:advice id="myAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="list*" isolation="DEFAULT" propagation="REQUIRED" read-only="true"/>
+
+            <tx:method name="add*" isolation="DEFAULT" propagation="REQUIRED"/>
+            <tx:method name="show*" isolation="DEFAULT" propagation="REQUIRED" read-only="true"/>
+            <tx:method name="del*" isolation="DEFAULT" propagation="REQUIRED"/>
+            <tx:method name="find*" isolation="DEFAULT" propagation="REQUIRED" read-only="true"/>
+            <tx:method name="update*" isolation="DEFAULT" propagation="REQUIRED"/>
+            <tx:method name="regist*" isolation="DEFAULT" propagation="REQUIRED"/>
+            <tx:method name="login*" isolation="DEFAULT" propagation="REQUIRED"/>
+            <tx:method name="query*" isolation="DEFAULT" propagation="REQUIRED"/>
+            <tx:method name="select*" isolation="DEFAULT" propagation="REQUIRED" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+    <!-- aop配置切入点 -->
+    <aop:config>
+        <aop:pointcut expression="execution(* cn.edu.ldu.service..*.*(..))" id="myPointCut"/>
+        <aop:advisor advice-ref="myAdvice" pointcut-ref="myPointCut"/>
+    </aop:config>
+
+</beans>
